@@ -129,14 +129,3 @@ The basic operation demonstrated by FrameFlow is:
 5. As acknowledgements are received, the sender window moves forward.
 6. When a frame is lost, the selected protocol determines the recovery behaviour.
 7. The experiment records transmission and retransmission activity for analysis.
-
-### Example
-
-For a window size of 3:
-
-```text
-Initial Window
-
-[ F0 ][ F1 ][ F2 ]  F3  F4  F5
-  ↑
- Base
