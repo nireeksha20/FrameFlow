@@ -70,8 +70,3 @@ transmission or network monitoring system.
 License
 
 MIT License
-
-
-**This is the one I'd use.** It gives someone visiting your GitHub enough information to understand the project without making them scroll through a huge README.
-
-One small addition later would be **1–2 screenshots**, but otherwise I'd consider the README finished.
