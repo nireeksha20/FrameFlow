@@ -3,144 +3,528 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-
-    <title>FrameFlow | Sliding Window Simulator</title>
-
+    <title>FrameFlow | Sliding Window Learning Lab</title>
     <link rel="stylesheet" href="style.css" />
   </head>
-
   <body>
     <header class="header">
       <div>
         <h1>FrameFlow</h1>
-        <p>Sliding Window Protocol Simulator</p>
+        <p>Interactive Sliding Window Protocol Learning Lab</p>
       </div>
     </header>
 
     <main class="container">
-      <!-- Controls -->
-      <section class="controls card">
-        <div class="control-group">
-          <label for="windowSize">Window Size</label>
-          <input type="number" id="windowSize" min="1" max="8" value="4" />
+      <section class="card settings">
+        <div class="section-title">
+          <div>
+            <h2>Experiment Settings</h2>
+            <p>Configure the protocol before starting an experiment.</p>
+          </div>
         </div>
 
-        <div class="control-group">
-          <label for="totalFrames">Total Frames</label>
-          <input type="number" id="totalFrames" min="1" max="20" value="10" />
+        <div class="settings-grid">
+          <label
+            >Protocol
+            <select id="protocol">
+              <option value="gbn">Go-Back-N</option>
+              <option value="sr">Selective Repeat</option>
+            </select>
+          </label>
+
+          <label
+            >Window Size
+            <input id="windowSize" type="number" min="1" max="8" value="4" />
+          </label>
+
+          <label
+            >Total Frames
+            <input id="totalFrames" type="number" min="1" max="30" value="12" />
+          </label>
+
+          <label
+            >Loss Mode
+            <select id="lossMode">
+              <option value="manual">Manual Frame Loss</option>
+              <option value="random">Random Loss</option>
+              <option value="none">No Loss</option>
+            </select>
+          </label>
+
+          <label id="manualLossWrap"
+            >Frame to Lose
+            <select id="manualLossFrame">
+              <option value="-1">None</option>
+            </select>
+          </label>
+
+          <label id="lossRateWrap"
+            >Random Loss (%)
+            <input id="lossRate" type="number" min="0" max="80" value="20" />
+          </label>
         </div>
 
-        <div class="control-group">
-          <label for="lossRate">Frame Loss (%)</label>
-          <input type="number" id="lossRate" min="0" max="80" value="20" />
+        <div class="speed-row">
+          <span>Transmission Speed</span>
+          <button class="speed-btn" data-speed="slow" type="button">
+            Slow
+          </button>
+          <button class="speed-btn active" data-speed="default" type="button">
+            Default
+          </button>
+          <button class="speed-btn" data-speed="fast" type="button">
+            Fast
+          </button>
+          <span id="speedLabel" class="muted">Default</span>
         </div>
 
-        <button id="startBtn" class="primary-btn">Start Simulation</button>
-
-        <button id="pauseBtn" class="secondary-btn">Pause</button>
-
-        <button id="resetBtn" class="secondary-btn">Reset</button>
+        <div class="button-row">
+          <button id="startBtn" class="primary-btn" type="button">
+            Start / Restart
+          </button>
+          <button id="prevBtn" class="secondary-btn" type="button">
+            ← Previous Step
+          </button>
+          <button id="nextBtn" class="secondary-btn" type="button">
+            Next Step →
+          </button>
+          <button id="playBtn" class="secondary-btn" type="button">
+            ▶ Auto Play
+          </button>
+          <button id="resetBtn" class="secondary-btn" type="button">
+            Reset
+          </button>
+        </div>
       </section>
 
-      <!-- Protocol Information -->
-      <section class="protocol-info card">
+      <section class="protocol-bar card">
         <div>
-          <span class="label">Protocol</span>
-          <strong>Sliding Window</strong>
+          <span>Protocol</span><strong id="protocolLabel">Go-Back-N</strong>
         </div>
-
+        <div><span>Step</span><strong id="stepLabel">0 / 0</strong></div>
+        <div><span>Status</span><strong id="statusText">Ready</strong></div>
         <div>
-          <span class="label">Mode</span>
-          <strong>Go-Back-N</strong>
-        </div>
-
-        <div>
-          <span class="label">Status</span>
-          <strong id="statusText">Ready</strong>
+          <span>Current Window</span><strong id="windowLabel">—</strong>
         </div>
       </section>
 
-      <!-- Main Simulation -->
       <section class="simulation">
-        <!-- Sender -->
         <div class="device card">
-          <h2>Sender</h2>
-
-          <div class="device-subtitle">Transmission Window</div>
-
-          <div id="senderWindow" class="frame-container"></div>
+          <div class="device-heading">
+            <div>
+              <h2>Sender</h2>
+              <p>Transmission window</p>
+            </div>
+            <span class="badge" id="senderState">Ready</span>
+          </div>
+          <div id="senderWindow" class="frame-grid"></div>
         </div>
 
-        <!-- Transmission Area -->
-        <div class="transmission">
-          <div class="packet-arrow">
-            <span>FRAME</span>
-            <div class="arrow-line"></div>
-            <span>→</span>
-          </div>
-
+        <div class="network-center">
+          <div class="flow-label">FRAMES →</div>
+          <div class="network-line"></div>
           <div id="activityMessage" class="activity-message">
-            Waiting for transmission...
+            Configure an experiment and press Start.
           </div>
-
-          <div class="packet-arrow">
-            <span>ACK</span>
-            <div class="arrow-line reverse"></div>
-            <span>←</span>
-          </div>
+          <div class="network-line ack-line"></div>
+          <div class="flow-label">← ACKs</div>
         </div>
 
-        <!-- Receiver -->
         <div class="device card">
-          <h2>Receiver</h2>
-
-          <div class="device-subtitle">Received Frames</div>
-
-          <div id="receiverWindow" class="frame-container"></div>
+          <div class="device-heading">
+            <div>
+              <h2>Receiver</h2>
+              <p>Received / buffered frames</p>
+            </div>
+            <span class="badge success" id="receiverState">Ready</span>
+          </div>
+          <div id="receiverWindow" class="frame-grid"></div>
         </div>
       </section>
 
-      <!-- Current Window -->
-      <section class="window-status card">
-        <h2>Current Window</h2>
-
-        <div id="windowDisplay" class="window-display">F0 → F3</div>
+      <section class="card state-panel">
+        <div class="section-title">
+          <div>
+            <h2>Protocol State</h2>
+            <p>
+              The internal state is shown so the animation can be connected to
+              the algorithm.
+            </p>
+          </div>
+        </div>
+        <div class="state-grid">
+          <div><span>Base</span><strong id="baseState">—</strong></div>
+          <div><span>Next Frame</span><strong id="nextState">—</strong></div>
+          <div>
+            <span>Waiting for ACK</span><strong id="waitingState">—</strong>
+          </div>
+          <div><span>Last ACK</span><strong id="lastAckState">—</strong></div>
+          <div>
+            <span>Expected Frame</span><strong id="expectedState">—</strong>
+          </div>
+          <div>
+            <span>Current Event</span><strong id="eventState">—</strong>
+          </div>
+        </div>
       </section>
 
-      <!-- Statistics -->
+      <section class="legend card">
+        <h2>Frame States</h2>
+        <div class="legend-items">
+          <span><i class="dot ready"></i> Ready</span>
+          <span><i class="dot waiting"></i> Waiting for ACK</span>
+          <span><i class="dot received"></i> ACKed / Received</span>
+          <span><i class="dot lost"></i> Lost</span>
+          <span><i class="dot retransmit"></i> Retransmission</span>
+          <span><i class="dot buffered"></i> Buffered</span>
+        </div>
+      </section>
+
+      <section class="card">
+        <div class="section-title">
+          <div>
+            <h2>Step Explanation</h2>
+            <p id="explanation">
+              Start an experiment to see why each protocol event happens.
+            </p>
+          </div>
+        </div>
+      </section>
+
       <section class="statistics">
         <div class="stat-card">
-          <span>Frames Sent</span>
-          <strong id="framesSent">0</strong>
+          <span>Frames Sent</span><strong id="framesSent">0</strong>
         </div>
-
         <div class="stat-card">
-          <span>Frames Received</span>
-          <strong id="framesReceived">0</strong>
+          <span>Frames Received</span><strong id="framesReceived">0</strong>
         </div>
-
         <div class="stat-card">
-          <span>ACKs Received</span>
-          <strong id="acksReceived">0</strong>
+          <span>ACKs</span><strong id="acksReceived">0</strong>
         </div>
-
         <div class="stat-card">
-          <span>Lost Frames</span>
-          <strong id="lostFrames">0</strong>
+          <span>Lost</span><strong id="lostFrames">0</strong>
         </div>
-
         <div class="stat-card">
-          <span>Retransmissions</span>
-          <strong id="retransmissions">0</strong>
+          <span>Retransmissions</span><strong id="retransmissions">0</strong>
+        </div>
+        <div class="stat-card">
+          <span>Efficiency</span><strong id="efficiency">0%</strong>
         </div>
       </section>
 
-      <!-- Event Log -->
-      <section class="log-section card">
-        <h2>Transmission Log</h2>
+      <section class="card results">
+        <div class="section-title">
+          <div>
+            <h2>Experiment Results</h2>
+            <p>
+              Completed experiments are stored for comparison during this
+              session.
+            </p>
+          </div>
+          <button id="clearHistoryBtn" class="secondary-btn" type="button">
+            Clear History
+          </button>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>#</th>
+                <th>Protocol</th>
+                <th>Window</th>
+                <th>Loss</th>
+                <th>Sent</th>
+                <th>Retrans.</th>
+                <th>Efficiency</th>
+              </tr>
+            </thead>
+            <tbody id="historyBody">
+              <tr>
+                <td colspan="7" class="empty">No completed experiments yet.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
 
-        <div id="eventLog" class="event-log">
-          <div class="log-item">FrameFlow initialized. Ready to simulate.</div>
+      <section class="card chart-card">
+        <div class="section-title">
+          <div>
+            <h2>Graphical Analysis</h2>
+            <p>
+              Compare completed experiments. The chart uses the recorded
+              efficiency values.
+            </p>
+          </div>
+        </div>
+        <div class="chart-wrap">
+          <svg
+            id="efficiencyChart"
+            viewBox="0 0 900 330"
+            role="img"
+            aria-label="Efficiency comparison chart"
+          ></svg>
+        </div>
+      </section>
+
+      <section class="card log-section">
+        <div class="section-title">
+          <div>
+            <h2>Transmission Log</h2>
+            <p>
+              Events from the current experiment are shown here, with the newest
+              event first.
+            </p>
+          </div>
+        </div>
+        <div id="eventLog" class="event-log" aria-live="polite"></div>
+      </section>
+
+      <section class="card learn">
+        <div class="section-title">
+          <div>
+            <h2>Learn the Concepts</h2>
+            <p>
+              Understand the idea first, then use the simulator to observe the
+              same process visually.
+            </p>
+          </div>
+        </div>
+
+        <div class="learning-block">
+          <h3>What problem does Sliding Window solve?</h3>
+          <p>
+            When two devices communicate, the sender should not have to stop
+            after every frame and wait for an acknowledgement. Waiting after
+            every frame can leave the communication link idle. A sliding window
+            allows several frames to be outstanding at the same time while still
+            controlling how much unacknowledged data can be in transit.
+          </p>
+        </div>
+
+        <div class="learning-block">
+          <h3>How does it work?</h3>
+          <div class="how-steps">
+            <div class="how-step">
+              <b>1</b
+              ><span
+                ><strong>Create frames</strong> — Data is divided into numbered
+                frames such as F0, F1, F2 and F3.</span
+              >
+            </div>
+            <div class="how-step">
+              <b>2</b
+              ><span
+                ><strong>Open a window</strong> — The sender is allowed to
+                transmit only the frames inside its current window.</span
+              >
+            </div>
+            <div class="how-step">
+              <b>3</b
+              ><span
+                ><strong>Transmit frames</strong> — Several frames can be sent
+                before the sender has to wait for all acknowledgements.</span
+              >
+            </div>
+            <div class="how-step">
+              <b>4</b
+              ><span
+                ><strong>Receive and acknowledge</strong> — The receiver accepts
+                frames and sends ACKs according to the selected protocol.</span
+              >
+            </div>
+            <div class="how-step">
+              <b>5</b
+              ><span
+                ><strong>Slide the window</strong> — As frames become
+                acknowledged, the sender moves the window forward and new frames
+                become eligible for transmission.</span
+              >
+            </div>
+            <div class="how-step">
+              <b>6</b
+              ><span
+                ><strong>Handle loss</strong> — If a frame is lost, the sender
+                uses timeout/retransmission behaviour defined by the selected
+                protocol.</span
+              >
+            </div>
+            <div class="how-step">
+              <b>7</b
+              ><span
+                ><strong>Measure the experiment</strong> — FrameFlow records
+                transmissions, losses, retransmissions, ACKs and efficiency so
+                different configurations can be compared.</span
+              >
+            </div>
+          </div>
+        </div>
+
+        <div class="learning-block">
+          <h3>How does the window move?</h3>
+          <p>
+            Suppose the window size is 3 and the sender starts with F0, F1 and
+            F2 available. After the earliest required acknowledgements arrive,
+            the window moves forward so that new frames can enter it.
+          </p>
+          <div class="how-steps">
+            <div class="how-step">
+              <b>1</b
+              ><span
+                ><strong>Initial window</strong> — The sender may have F0, F1
+                and F2 in flight.</span
+              >
+            </div>
+            <div class="how-step">
+              <b>2</b
+              ><span
+                ><strong>ACK arrives</strong> — The acknowledged frame no longer
+                needs to occupy a window position.</span
+              >
+            </div>
+            <div class="how-step">
+              <b>3</b
+              ><span
+                ><strong>Window slides</strong> — The base moves forward and a
+                new frame, such as F3, can enter.</span
+              >
+            </div>
+            <div class="how-step">
+              <b>4</b
+              ><span
+                ><strong>Repeat</strong> — The same process continues until all
+                frames are delivered.</span
+              >
+            </div>
+          </div>
+        </div>
+
+        <div class="learning-block">
+          <h3>What happens when a frame is lost?</h3>
+          <div class="how-steps">
+            <div class="how-step">
+              <b>GBN</b
+              ><span
+                ><strong>Go-Back-N</strong> — A timeout at the oldest
+                missing/unacknowledged frame causes that frame and the later
+                outstanding frames to be retransmitted.</span
+              >
+            </div>
+            <div class="how-step">
+              <b>SR</b
+              ><span
+                ><strong>Selective Repeat</strong> — Correctly received
+                out-of-order frames can be buffered, so only the missing frame
+                needs retransmission.</span
+              >
+            </div>
+          </div>
+        </div>
+
+        <div class="learning-block">
+          <h3>Key Terms</h3>
+          <div class="concept-grid" id="conceptGrid"></div>
+        </div>
+
+        <div class="learning-block">
+          <h3>What do you see in FrameFlow?</h3>
+          <div class="mapping-grid">
+            <div>
+              <strong>Sender</strong
+              ><span>Computer that sends the frames.</span>
+            </div>
+            <div>
+              <strong>Receiver</strong
+              ><span
+                >Computer that receives frames and sends acknowledgements.</span
+              >
+            </div>
+            <div>
+              <strong>Current Window</strong
+              ><span
+                >The range of frames currently allowed to be outstanding.</span
+              >
+            </div>
+            <div>
+              <strong>Waiting for ACK</strong
+              ><span
+                >Frames that have been sent but whose acknowledgement has not
+                yet been processed.</span
+              >
+            </div>
+            <div>
+              <strong>Frame Loss</strong
+              ><span
+                >A simulated transmission failure used to observe retransmission
+                behaviour.</span
+              >
+            </div>
+            <div>
+              <strong>Transmission Log</strong
+              ><span
+                >A record of events from the current experiment, with the newest
+                event shown first.</span
+              >
+            </div>
+          </div>
+        </div>
+
+        <div class="learning-block">
+          <h3>How to use FrameFlow as a learning experiment</h3>
+          <ol class="usage-list">
+            <li>Choose a window size and number of frames.</li>
+            <li>Select Go-Back-N or Selective Repeat.</li>
+            <li>
+              Use manual loss when you want to deliberately reproduce a
+              particular scenario.
+            </li>
+            <li>
+              Use <strong>Next Step</strong> to observe one protocol event at a
+              time, or Auto Play to run continuously.
+            </li>
+            <li>
+              Try the same experiment with different window sizes or loss
+              conditions.
+            </li>
+            <li>
+              Compare retransmissions and efficiency in the experiment history
+              and graph.
+            </li>
+          </ol>
+        </div>
+      </section>
+
+      <section class="card comparison">
+        <div class="section-title">
+          <div>
+            <h2>Go-Back-N vs Selective Repeat</h2>
+            <p>
+              Use the same loss scenario to observe the difference between the
+              two ARQ approaches.
+            </p>
+          </div>
+        </div>
+        <div class="comparison-grid">
+          <article>
+            <h3>Go-Back-N</h3>
+            <p>
+              When a frame is lost, the sender retransmits the missing frame and
+              subsequent outstanding frames.
+            </p>
+            <div class="mini-flow">
+              F0 ✓ → F1 ✓ → F2 ✕ → F3 → <b>retransmit F2, F3...</b>
+            </div>
+          </article>
+          <article>
+            <h3>Selective Repeat</h3>
+            <p>
+              Correctly received out-of-order frames can be buffered, and only
+              the missing frame is retransmitted.
+            </p>
+            <div class="mini-flow">
+              F0 ✓ → F1 ✓ → F2 ✕ → F3 ✓ → <b>retransmit F2</b>
+            </div>
+          </article>
         </div>
       </section>
     </main>
