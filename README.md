@@ -2,130 +2,76 @@
 
 ### Interactive Sliding Window Protocol Simulator
 
-FrameFlow is an interactive learning and experimentation tool for understanding
-Sliding Window protocols through visual simulation.
+FrameFlow is an interactive learning and experimentation tool for visualizing
+Sliding Window protocols. It demonstrates frame transmission,
+acknowledgements, window movement, frame loss, and retransmission.
 
-It demonstrates how frames are transmitted between a sender and receiver,
-how acknowledgements are generated, how the sender window moves, and how
-different protocols handle frame loss and retransmission.
+## Features
 
----
+- Go-Back-N and Selective Repeat simulation
+- Adjustable window size and total frames
+- Manual, random, or no frame loss
+- Slow / Default / Fast transmission
+- Previous Step / Next Step / Auto Play
+- Sender, receiver and ACK visualization
+- Protocol state and sequence numbers
+- Frame loss and retransmission visualization
+- Transmission log
+- Experiment statistics and efficiency
+- Experiment history and efficiency graph
+- Integrated learning material and terminology
+- Go-Back-N vs Selective Repeat comparison
 
-## 📌 Problem Statement
+## How It Works
 
-Sliding Window protocols are an important concept in Computer Networks, but
-their operation can be difficult to understand using only static diagrams
-and theoretical explanations.
+The simulator models the basic Sliding Window process:
 
-FrameFlow provides a visual and interactive way to study these protocols by
-allowing users to control the simulation, introduce frame loss, observe
-acknowledgements and retransmissions, and compare different protocol
-behaviours.
+1. Frames are created and assigned sequence numbers.
+2. The sender transmits frames within its window.
+3. The receiver sends acknowledgements.
+4. The sender moves the window as frames are acknowledged.
+5. Lost frames trigger protocol-specific retransmission behaviour.
+6. Experiment results are recorded for analysis.
 
----
+### Go-Back-N
 
-## 🎯 Objectives
+When a frame is lost, the missing frame and subsequent outstanding frames
+are retransmitted after timeout.
 
-- Visualize Sliding Window protocol operation.
-- Understand how frames move between sender and receiver.
-- Observe acknowledgements and window movement.
-- Demonstrate frame loss and retransmission.
-- Compare Go-Back-N and Selective Repeat.
-- Experiment with different window sizes and loss conditions.
-- Analyze simulation results using statistics and efficiency.
-- Provide step-by-step learning material alongside the simulation.
+### Selective Repeat
 
----
+Correctly received out-of-order frames can be buffered, so only the missing
+frame needs to be retransmitted.
 
-## ✨ Features
+## Technology
 
-### Simulation Controls
+- HTML5
+- CSS3
+- JavaScript
+- SVG
 
-- Adjustable window size
-- Adjustable total number of frames
-- Manual frame loss
-- Random frame loss
-- No-loss mode
-- Slow / Default / Fast transmission speed
-- Start / Restart simulation
-- Reset simulation
+## Run
 
-### Step-by-Step Simulation
+Open `index.html` using VS Code Live Server or directly in a modern browser.
 
-- Previous Step
-- Next Step
-- Auto Play / Pause
-- Current simulation step
-- Current protocol state
-- Current sender window
-- Frames waiting for ACK
+## Project Structure
 
-### Protocol Visualization
+```text
+FrameFlow/
+├── index.html
+├── style.css
+├── script.js
+└── README.md
+Scope
 
-- Sender and receiver representation
-- Frame transmission
-- ACK transmission
-- Sequence numbers
-- Frame loss
-- Retransmission
-- Out-of-order frame buffering
-- Window movement
-- Expected frame
-- Base and next-frame state
+FrameFlow is a protocol simulator and learning tool, not a real packet
+transmission or network monitoring system.
 
-### Statistics and Analysis
+License
 
-- Frames sent
-- Frames received
-- ACKs
-- Lost frames
-- Retransmissions
-- Efficiency
-- Experiment history
-- Efficiency comparison graph
+MIT License
 
-### Learning Material
 
-FrameFlow includes an integrated learning section covering:
+**This is the one I'd use.** It gives someone visiting your GitHub enough information to understand the project without making them scroll through a huge README.
 
-- Computer Networks
-- Protocols
-- Frames
-- Sequence Numbers
-- Sender and Receiver
-- ACK
-- Sender Window
-- Window Size
-- Sliding
-- Base
-- Next Frame
-- Outstanding Frames
-- Expected Frame
-- Buffer
-- Out-of-order Frames
-- Timeout
-- Frame Loss
-- Retransmission
-- ARQ
-- Cumulative ACK
-- Flow Control
-- Error Control
-- Go-Back-N
-- Selective Repeat
-- Throughput
-- Efficiency
-- Experiments
-
----
-
-## 🔄 How Sliding Window Works
-
-The basic operation demonstrated by FrameFlow is:
-
-1. Data is divided into numbered frames.
-2. The sender maintains a transmission window.
-3. Multiple frames can be transmitted without waiting for every ACK.
-4. The receiver processes incoming frames and sends acknowledgements.
-5. As acknowledgements are received, the sender window moves forward.
-6. When a frame is lost, the selected protocol determines the recovery behaviour.
-7. The experiment records transmission and retransmission activity for analysis.
+One small addition later would be **1–2 screenshots**, but otherwise I'd consider the README finished.
