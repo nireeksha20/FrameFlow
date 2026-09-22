@@ -1,0 +1,150 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <title>FrameFlow | Sliding Window Simulator</title>
+
+    <link rel="stylesheet" href="style.css" />
+  </head>
+
+  <body>
+    <header class="header">
+      <div>
+        <h1>FrameFlow</h1>
+        <p>Sliding Window Protocol Simulator</p>
+      </div>
+    </header>
+
+    <main class="container">
+      <!-- Controls -->
+      <section class="controls card">
+        <div class="control-group">
+          <label for="windowSize">Window Size</label>
+          <input type="number" id="windowSize" min="1" max="8" value="4" />
+        </div>
+
+        <div class="control-group">
+          <label for="totalFrames">Total Frames</label>
+          <input type="number" id="totalFrames" min="1" max="20" value="10" />
+        </div>
+
+        <div class="control-group">
+          <label for="lossRate">Frame Loss (%)</label>
+          <input type="number" id="lossRate" min="0" max="80" value="20" />
+        </div>
+
+        <button id="startBtn" class="primary-btn">Start Simulation</button>
+
+        <button id="pauseBtn" class="secondary-btn">Pause</button>
+
+        <button id="resetBtn" class="secondary-btn">Reset</button>
+      </section>
+
+      <!-- Protocol Information -->
+      <section class="protocol-info card">
+        <div>
+          <span class="label">Protocol</span>
+          <strong>Sliding Window</strong>
+        </div>
+
+        <div>
+          <span class="label">Mode</span>
+          <strong>Go-Back-N</strong>
+        </div>
+
+        <div>
+          <span class="label">Status</span>
+          <strong id="statusText">Ready</strong>
+        </div>
+      </section>
+
+      <!-- Main Simulation -->
+      <section class="simulation">
+        <!-- Sender -->
+        <div class="device card">
+          <h2>Sender</h2>
+
+          <div class="device-subtitle">Transmission Window</div>
+
+          <div id="senderWindow" class="frame-container"></div>
+        </div>
+
+        <!-- Transmission Area -->
+        <div class="transmission">
+          <div class="packet-arrow">
+            <span>FRAME</span>
+            <div class="arrow-line"></div>
+            <span>→</span>
+          </div>
+
+          <div id="activityMessage" class="activity-message">
+            Waiting for transmission...
+          </div>
+
+          <div class="packet-arrow">
+            <span>ACK</span>
+            <div class="arrow-line reverse"></div>
+            <span>←</span>
+          </div>
+        </div>
+
+        <!-- Receiver -->
+        <div class="device card">
+          <h2>Receiver</h2>
+
+          <div class="device-subtitle">Received Frames</div>
+
+          <div id="receiverWindow" class="frame-container"></div>
+        </div>
+      </section>
+
+      <!-- Current Window -->
+      <section class="window-status card">
+        <h2>Current Window</h2>
+
+        <div id="windowDisplay" class="window-display">F0 → F3</div>
+      </section>
+
+      <!-- Statistics -->
+      <section class="statistics">
+        <div class="stat-card">
+          <span>Frames Sent</span>
+          <strong id="framesSent">0</strong>
+        </div>
+
+        <div class="stat-card">
+          <span>Frames Received</span>
+          <strong id="framesReceived">0</strong>
+        </div>
+
+        <div class="stat-card">
+          <span>ACKs Received</span>
+          <strong id="acksReceived">0</strong>
+        </div>
+
+        <div class="stat-card">
+          <span>Lost Frames</span>
+          <strong id="lostFrames">0</strong>
+        </div>
+
+        <div class="stat-card">
+          <span>Retransmissions</span>
+          <strong id="retransmissions">0</strong>
+        </div>
+      </section>
+
+      <!-- Event Log -->
+      <section class="log-section card">
+        <h2>Transmission Log</h2>
+
+        <div id="eventLog" class="event-log">
+          <div class="log-item">FrameFlow initialized. Ready to simulate.</div>
+        </div>
+      </section>
+    </main>
+
+    <script src="script.js"></script>
+  </body>
+</html>
